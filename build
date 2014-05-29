@@ -1,0 +1,7 @@
+#!/bin/bash
+
+cd master
+docker build -t salt-master .
+cd ../minion
+docker build -t salt-minion .
+cd ..

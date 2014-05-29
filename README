@@ -1,0 +1,36 @@
+This is a simple -- very simple -- salt master/minion docker image build repo.
+
+Install
+-------
+
+- Docker has to be installed. I suggest using the settings in docker.defaults (in /etc/defaults/docker)
+- Run ./build. This will build the images salt-master and salt-minion
+- Determine what IP address will be used by the master. Two possible values:
+  - If you have no running containers, find the address of the bridge docker0 or whatever bridge docker is using. The number following the value will be what value the first container launched will be assigned most likely
+  - If you have running containers, run docker inspect on your last-launched container. It'll be the number following that IP.
+- Use the number in the previous step to set "master:" in ./master/master.conf
+- Launch the master:
+  docker run -d --name salt-master -p 49522:22 -p 49505:49505 -p 49506:49506 salt-master
+- Run docker ps to obtain the port for ssh
+  docker ps
+
+For instance, you'll see:
+  848debbc4527        salt-master:latest   /bin/sh -c /usr/loca   6 minutes ago       Up 6 minutes        0.0.0.0:49505->49505/tcp, 0.0.0.0:49506->49506/tcp, 0.0.0.0:49522->22/tcp   salt-master
+
+- SSH into the master to verify
+  ssh -p 49505 root@127.0.0.1
+
+- Launch the minion
+  docker run -d -P --name=docker-minionX salt-minion
+
+- On the master, accept keys
+  salt-key -A
+
+- On the master
+  root@848debbc4527:~# salt-key
+  Accepted Keys:
+  1195f75150e3
+  Unaccepted Keys:
+  Rejected Keys:
+
+- Go to town!
